@@ -16,6 +16,64 @@ A Python framework that provides an abstraction layer for different AI model con
 pip install multimodal-agent-framework
 ```
 
+## Environment Variables
+
+The framework requires API keys and configuration for different AI providers. Create a `.env` file in your project root or set these environment variables:
+
+### Required for OpenAI
+```bash
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+### Required for Claude (Anthropic)
+```bash
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+```
+
+### Required for Azure OpenAI
+```bash
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_API_KEY=your_azure_openai_api_key_here
+```
+
+### Required for Azure OpenAI DALL-E
+```bash
+AZURE_OPENAI_DALLE_ENDPOINT=https://your-dalle-resource.openai.azure.com/
+AZURE_OPENAI_DALLE_API_KEY=your_azure_dalle_api_key_here
+```
+
+### Required for Azure AI Inference (Open Source Models)
+```bash
+AZURE_OPENSOURCE_ENDPOINT=https://your-inference-endpoint.inference.ai.azure.com
+AZURE_OPENSOURCE_API_KEY=your_azure_inference_api_key_here
+```
+
+### Example .env file
+```bash
+# OpenAI Configuration
+OPENAI_API_KEY=sk-proj-...
+
+# Anthropic Claude Configuration
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Azure OpenAI Configuration
+AZURE_OPENAI_ENDPOINT=https://myresource.openai.azure.com/
+AZURE_OPENAI_API_KEY=abc123...
+
+# Azure OpenAI DALL-E Configuration (optional, for image generation)
+AZURE_OPENAI_DALLE_ENDPOINT=https://mydalle.openai.azure.com/
+AZURE_OPENAI_DALLE_API_KEY=xyz789...
+
+# Azure AI Inference Configuration (optional, for open source models)
+AZURE_OPENSOURCE_ENDPOINT=https://myinference.inference.ai.azure.com
+AZURE_OPENSOURCE_API_KEY=def456...
+```
+
+**Important:**
+- Only set the environment variables for the providers you plan to use
+- Keep your API keys secure and never commit them to version control
+- The framework uses `python-dotenv` to automatically load `.env` files
+
 ## Quick Start
 
 ```python
