@@ -4,16 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a multi-modal agent framework that provides an abstraction layer for different AI model connectors (OpenAI, Claude, Azure) with unified interfaces for chat interactions, tool calling, and token management.
+This is a multi-modal agent framework that provides an abstraction layer for different AI model connectors (OpenAI, Claude, Azure) with unified interfaces for chat interactions, tool calling, and token management. The framework is designed to be published as a standalone Python package.
 
 ## Architecture
 
 ### Core Components
 
-- **`connectors.py`** - Base `Connector` class and implementations (`OpenAIConnector`, `ClaudeConnector`, `AzureConnector`) for different AI model providers
+- **`connectors.py`** - Base `Connector` class and implementations (`OpenAIConnector`, `ClaudeConnector`, `AzureOpenSourceConnector`) for different AI model providers
 - **`multimodal_agent.py`** - `MultiModalAgent` class that orchestrates chat interactions with support for text/image inputs, tool calling, and conversation review
-- **`helper_functions.py`** - Utility functions for file operations, image fetching from Unsplash, and content management
+- **`helper_functions.py`** - Client factory functions for different AI providers (OpenAI, Claude, Azure)
 - **`function_schema_generator.py`** - Generates JSON schemas from Python function objects for tool calling
+- **`logging_config.py`** - Simple logging configuration for the package
+- **`token_tracker.py`** - Token usage tracking implementation
 
 ### Key Design Patterns
 
@@ -23,26 +25,37 @@ This is a multi-modal agent framework that provides an abstraction layer for dif
 
 3. **Tool Integration**: Functions can be automatically converted to tool schemas and executed through the `make_tool_calls` method
 
-4. **Token Management**: Built-in cost tracking and token usage monitoring across all providers
+4. **Token Management**: Built-in cost tracking and token usage monitoring across all providers using internal `TokenUsageTracker`
 
-### External Dependencies
+### Package Structure
 
-The codebase imports from an `app` module structure:
-- `app.utils.logging_config` - Centralized logging configuration
-- `app.base_module.token_handling.token_usage_tracker` - Token usage tracking
-- `app.base_module.helper_functions` - Additional utility functions
+This is a self-contained Python package with no external `app.*` dependencies. All utilities are contained within the `multimodal_agent_framework` module.
 
 ## Development Commands
 
-This project appears to be a pure Python module without build scripts. Use standard Python development practices:
+### Package Development
 
 ```bash
-# Install dependencies (requirements.txt is currently empty)
-pip install -r requirements.txt
+# Install in development mode
+pip install -e .
 
-# Run Python files directly
-python connectors.py
-python multimodal_agent.py
+# Install with development dependencies
+pip install -e .[dev]
+
+# Run tests
+pytest tests/
+
+# Run a specific test file
+python -m pytest tests/framework_test.py
+
+# Build the package
+python -m build
+
+# Format code
+black multimodal_agent_framework/
+
+# Type checking
+mypy multimodal_agent_framework/
 ```
 
 ## Key Implementation Notes

@@ -6,7 +6,7 @@ from azure.core.credentials import AzureKeyCredential
 from dotenv import load_dotenv
 
 load_dotenv()
-from logging_config import get_logger
+from .logging_config import get_logger
 from openai import AzureOpenAI
 
 logger = get_logger()

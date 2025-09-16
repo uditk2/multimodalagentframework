@@ -109,15 +109,45 @@ agent = MultiModalAgent(
 
 ### Requirements
 
-- Python 3.8+
-- See `requirements.txt` for dependencies
+- Python 3.9+
+- Dependencies are managed via `pyproject.toml`
 
 ### Installation for Development
 
 ```bash
 git clone <repository-url>
-cd multimodal-agent-framework
+cd AgentFramework
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install in editable mode
 pip install -e .
+
+# Install with development dependencies
+pip install -e .[dev]
+```
+
+**Note:** If you already have the package installed from PyPI (test or production), `pip install -e .` will replace it with your local development version. You can switch back by running `pip install multimodal-agent-framework` or uninstalling and reinstalling from PyPI.
+
+### Development Commands
+
+```bash
+# Run tests
+pytest tests/
+
+# Run a specific test
+python -m pytest tests/framework_test.py
+
+# Format code
+black multimodal_agent_framework/
+
+# Type checking
+mypy multimodal_agent_framework/
+
+# Build package
+python -m build
 ```
 
 ### Running Examples

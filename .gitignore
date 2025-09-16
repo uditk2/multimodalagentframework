@@ -1,2 +1,23 @@
 __pycache__/
-venv
+venv/
+.venv/
+.venv_*/
+
+# Package build artifacts
+*.egg-info/
+build/
+dist/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
