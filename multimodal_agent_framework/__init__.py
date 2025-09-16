@@ -6,10 +6,15 @@ A framework that provides an abstraction layer for different AI model connectors
 and token management.
 """
 
-from .connectors import Connector, OpenAIConnector, ClaudeConnector, AzureConnector
+from .connectors import (
+    Connector,
+    OpenAIConnector,
+    ClaudeConnector,
+    AzureOpenSourceConnector,
+)
 from .multimodal_agent import MultiModalAgent
 from .helper_functions import get_openai_client
-from .function_schema_generator import generate_schema_from_function
+from .function_schema_generator import generate_function_schema
 
 __version__ = "0.1.0"
 __all__ = [
