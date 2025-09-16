@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "multimodal-agent-framework"
-version = "0.1.0"
+version = "0.1.1"
 description = "A multi-modal agent framework with unified interfaces for different AI model providers"
 readme = "README.md"
 requires-python = ">=3.9"
