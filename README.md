@@ -134,14 +134,22 @@ response, updated_history = claude_agent.execute_user_ask(
 ## Advanced Features
 
 ### Tool Calling
+Use `generate_function_schema` to convert Python callables into the tool schema expected by the connectors and pass the resulting list through the `tools` argument of `execute_user_ask`.
 ```python
+from multimodal_agent_framework import generate_function_schema
+
 def get_weather(location: str) -> str:
     """Get weather information for a location"""
-    return f"The weather in {location} is sunny and 75°F"
+    return {"text": f"The weather in {location} is sunny and 75°F"}
 
-# Register function with agent
-agent.register_function(get_weather)
-response = agent.add_message("What's the weather in New York?")
+tools = [generate_function_schema(get_weather)]
+
+response, updated_history = agent.execute_user_ask(
+    user_input="What's the weather in New York?",
+    tools=tools,
+    model="gpt-4o-mini"
+)
+print(response)
 ```
 
 ### Multimodal Input
