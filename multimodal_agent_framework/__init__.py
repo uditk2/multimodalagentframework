@@ -19,5 +19,5 @@ __all__ = [
     "AzureConnector",
     "MultiModalAgent",
     "get_openai_client",
-    "generate_schema_from_function"
+    "generate_schema_from_function",
 ]
