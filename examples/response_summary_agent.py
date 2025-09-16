@@ -1,10 +1,4 @@
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from multimodal_agent import MultiModalAgent
-from connectors import OpenAIConnector
-from helper_functions import get_openai_client
+from multimodal_agent_framework import MultiModalAgent, OpenAIConnector, get_openai_client
 class ResponseSummaryAgent():
     SYSTEM_PROMPT = """
     Please generate a summary of the provided information. 

@@ -1,9 +1,9 @@
 import json
 import copy
 from typing import Union
-from logging_config import get_logger
+from .logging_config import get_logger
 logger = get_logger()
-from token_tracker import token_tracker
+from .token_tracker import token_tracker
 class Connector():
     def __init__(self, client):
         if client is None:

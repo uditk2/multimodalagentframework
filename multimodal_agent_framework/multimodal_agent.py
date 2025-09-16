@@ -1,6 +1,6 @@
-from connectors import Connector, ClaudeConnector
+from .connectors import Connector, ClaudeConnector
 from retrying import retry
-from logging_config import get_logger
+from .logging_config import get_logger
 logger = get_logger()
 
 class NoTokensAvailableError(Exception):
