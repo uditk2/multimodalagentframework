@@ -48,9 +48,9 @@ dev = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/multimodal-agent-framework"
-"Bug Reports" = "https://github.com/yourusername/multimodal-agent-framework/issues"
-"Source" = "https://github.com/yourusername/multimodal-agent-framework"
+"Homepage" = "https://github.com/uditk2/multimodalagentframework"
+"Bug Reports" = "https://github.com/uditk2/multimodalagentframework/issues"
+"Source" = "https://github.com/uditk2/multimodalagentframework"
 
 [tool.setuptools]
 packages = ["multimodal_agent_framework"]
