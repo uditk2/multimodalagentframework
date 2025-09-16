@@ -189,23 +189,11 @@ pip install -e .[dev]
 
 **Note:** If you already have the package installed from PyPI (test or production), `pip install -e .` will replace it with your local development version. You can switch back by running `pip install multimodal-agent-framework` or uninstalling and reinstalling from PyPI.
 
-### Development Commands
+### Format Code
 
 ```bash
-# Run tests
-pytest tests/
-
-# Run a specific test
-python -m pytest tests/framework_test.py
-
-# Format code
+# Install black first and then run the below command.
 black multimodal_agent_framework/
-
-# Type checking
-mypy multimodal_agent_framework/
-
-# Build package
-python -m build
 ```
 
 ### Running Examples
