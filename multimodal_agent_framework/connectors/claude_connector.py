@@ -54,7 +54,7 @@ class ClaudeConnector(Connector):
         chat_history=None,
         system_message=None,
         model="claude-sonnet-4-20250514",
-        max_tokens=20000,
+        max_tokens=8192,
         temperature=0,
         json_response=False,
         reasoning=None,

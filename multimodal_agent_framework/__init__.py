@@ -13,7 +13,13 @@ from .connectors import (
     AzureOpenSourceConnector,
 )
 from .multimodal_agent import MultiModalAgent
-from .helper_functions import get_openai_client
+from .helper_functions import (
+    get_openai_client,
+    get_claude_client,
+    get_azure_opensource_client,
+    get_openai_azure_client,
+    get_openai_azure_dalle_client,
+)
 from .function_schema_generator import generate_function_schema
 
 __version__ = "0.1.0"
@@ -21,8 +27,12 @@ __all__ = [
     "Connector",
     "OpenAIConnector",
     "ClaudeConnector",
-    "AzureConnector",
+    "AzureOpenSourceConnector",
     "MultiModalAgent",
     "get_openai_client",
-    "generate_schema_from_function",
+    "get_claude_client",
+    "get_azure_opensource_client",
+    "get_openai_azure_client",
+    "get_openai_azure_dalle_client",
+    "generate_function_schema",
 ]

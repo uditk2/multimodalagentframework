@@ -9,6 +9,8 @@ A Python framework that provides an abstraction layer for different AI model con
 - **Tool Calling**: Automatic function schema generation and execution
 - **Token Management**: Built-in cost tracking and token usage monitoring
 - **Conversation Review**: Optional reviewer system for conversation quality control
+- **Conversation Handoff**: Continue conversations seamlessly between different AI models (OpenAI ↔ Claude)
+- **Thinking Support**: Built-in support for models with reasoning capabilities, with user choice to continue conversations across different model providers
 
 ## Installation
 
@@ -103,12 +105,17 @@ print(response)
 ### OpenAI
 - GPT-4o, GPT-4o-mini
 - o1, o1-mini, o1-preview
-- o3-mini
-- Search-enabled models
+- o3, o3-mini
+- o4, o4-mini
+- GPT-4.1, GPT-4.1-mini
+- GPT-5, GPT-5-mini, GPT-5-nano
+- Search-enabled models (gpt-4o-search-preview, gpt-4o-mini-search-preview, gpt-5-search-preview)
 
 ### Claude (Anthropic)
+- Claude 4 Sonnet (claude-sonnet-4-20250514)
 - Claude 3.5 Sonnet
 - Claude 3 Opus, Sonnet, Haiku
+- All Claude models supported via API
 
 ### Azure AI
 - Azure OpenAI models
