@@ -1,6 +1,8 @@
 import json
 import copy
 from .base import Connector
+from ..configs.claude_config import ClaudeConfig
+from typing import Optional
 from ..logging_config import get_logger
 from ..token_tracker import token_tracker
 
@@ -10,6 +12,10 @@ logger = get_logger()
 class ClaudeConnector(Connector):
     supported_roles = ["system", "assistant", "user"]
     convert_image_fmt = {"jpeg": "png", "jpg": "png"}
+
+    def __init__(self, client, config: Optional[ClaudeConfig] = None):
+        super().__init__(client)
+        self.config = config or ClaudeConfig()
 
     def create_message_internal(self, text=None, base64_image=None):
         message = {"role": "user"}
@@ -53,7 +59,7 @@ class ClaudeConnector(Connector):
         self,
         chat_history=None,
         system_message=None,
-        model="claude-sonnet-4-20250514",
+        model=None,
         max_tokens=8192,
         temperature=0,
         json_response=False,
@@ -64,6 +70,7 @@ class ClaudeConnector(Connector):
             raise ValueError("System message is required")
         if chat_history is None or not isinstance(chat_history, list):
             raise ValueError("Chat history is required and should be a list")
+        model = model or self.config.default_model
         # This should be enforced. Currently, it is not enforced in the code.
         chat_history = self._adapt_chat_history(chat_history)
         if tools is not None:
@@ -91,10 +98,12 @@ class ClaudeConnector(Connector):
         logger.debug(f"Request to claude with kwargs: {kwargs}")
         response = self.client.messages.create(**kwargs)
         logger.debug(f"Response from claude: {response}")
+        # Compute costs using config pricing. Unknown models fall back gracefully.
+        prompt_per_token, completion_per_token = self.config.get_token_costs(model)
         # TODO: Check if we can remove the next 2 lines as we have introduced influx db for usage tracking.
         self._cost += (
-            response.usage.input_tokens * 0.000003
-            + response.usage.output_tokens * 0.000015
+            response.usage.input_tokens * prompt_per_token
+            + response.usage.output_tokens * completion_per_token
         )
         self._tokens = {
             "input_tokens": self._tokens["input_tokens"] + response.usage.input_tokens,

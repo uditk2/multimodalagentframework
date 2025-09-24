@@ -1,6 +1,8 @@
 import json
 import copy
 from .base import Connector
+from ..configs.azure_opensource_config import AzureOpenSourceConfig
+from typing import Optional
 from ..logging_config import get_logger
 from ..token_tracker import token_tracker
 
@@ -9,6 +11,10 @@ logger = get_logger()
 
 class AzureOpenSourceConnector(Connector):
     supported_roles = ["system", "assistant", "user", "function", "tool", "developer"]
+
+    def __init__(self, client, config: Optional[AzureOpenSourceConfig] = None):
+        super().__init__(client)
+        self.config = config or AzureOpenSourceConfig()
 
     def create_message_internal(self, text=None, base64_image=None):
         message = {"role": "user"}
@@ -68,7 +74,7 @@ class AzureOpenSourceConnector(Connector):
         self,
         chat_history=None,
         system_message=None,
-        model="Codestral-2501",
+        model=None,
         max_tokens=None,
         temperature=0.7,
         json_response=False,
@@ -79,6 +85,7 @@ class AzureOpenSourceConnector(Connector):
             raise ValueError("System message is required and should be a list")
         if chat_history is None or not isinstance(chat_history, list):
             raise ValueError("Chat history is required and should be a list")
+        model = model or self.config.default_model
         chat_history = self._adapt_chat_history(chat_history)
         messages = system_message + chat_history
         kwargs = {}
@@ -94,12 +101,12 @@ class AzureOpenSourceConnector(Connector):
             **kwargs,
             tools=tools,
         )
-        prompt_token_cost = {"Codestral-2501": 0.0000003}
-        output_token_cost = {"Codestral-2501": 0.0000009}
+        # Compute costs using config pricing. Unknown models fall back gracefully.
+        prompt_per_token, completion_per_token = self.config.get_token_costs(model)
         # TODO: Check if we can remove the next 2 lines as we have introduced influx db for usage tracking.
         self._cost += (
-            response.usage.prompt_tokens * prompt_token_cost[model]
-            + response.usage.completion_tokens * output_token_cost[model]
+            response.usage.prompt_tokens * prompt_per_token
+            + response.usage.completion_tokens * completion_per_token
         )
         self._tokens = {
             "input_tokens": self._tokens["input_tokens"] + response.usage.prompt_tokens,

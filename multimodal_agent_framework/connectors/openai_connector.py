@@ -1,6 +1,8 @@
 import json
 import copy
 from .base import Connector
+from ..configs.openai_config import OpenAIConfig
+from typing import Optional
 from ..logging_config import get_logger
 from ..token_tracker import token_tracker
 
@@ -10,6 +12,10 @@ logger = get_logger()
 class OpenAIConnector(Connector):
     supported_roles = ["system", "assistant", "user", "function", "tool", "developer"]
     reasoning = ["low", "medium", "high"]
+
+    def __init__(self, client, config: Optional[OpenAIConfig] = None):
+        super().__init__(client)
+        self.config = config or OpenAIConfig()
 
     def create_message_internal(self, text=None, base64_image=None):
         message = {"role": "user"}
@@ -108,7 +114,7 @@ class OpenAIConnector(Connector):
         self,
         chat_history=None,
         system_message=None,
-        model="gpt-4o",
+        model=None,
         max_tokens=None,
         temperature=0.7,
         json_response=False,
@@ -119,6 +125,7 @@ class OpenAIConnector(Connector):
             raise ValueError("System message is required and should be a list")
         if chat_history is None or not isinstance(chat_history, list):
             raise ValueError("Chat history is required and should be a list")
+        model = model or self.config.default_model
         chat_history = self._adapt_chat_history(chat_history)
         kwargs = {}
         ## TODO: ideally, we should take in details of the web search options from the user and pass it to the API.
@@ -166,36 +173,12 @@ class OpenAIConnector(Connector):
         response = self.client.chat.completions.create(
             model=model, messages=messages, tools=tools, **kwargs
         )
-        prompt_token_cost = {
-            "gpt-4o": 0.0000025,
-            "gpt-4o-mini": 0.00000015,
-            "o4-mini": 0.0000011,
-            "o3-mini": 0.0000011,
-            "o1": 0.000015,
-            "gpt-4.1": 0.000002,
-            "gpt-4.1-mini": 0.0000004,
-            "o3": 0.000002,
-            "gpt-5": 0.00000125,
-            "gpt-5-mini": 0.00000025,
-            "gpt-5-nano": 0.00000005,
-        }
-        output_token_cost = {
-            "gpt-4o": 0.000010,
-            "gpt-4o-mini": 0.0000006,
-            "o4-mini": 0.0000044,
-            "o3-mini": 0.0000044,
-            "o1": 0.000060,
-            "gpt-4.1": 0.000008,
-            "gpt-4.1-mini": 0.0000016,
-            "o3": 0.000008,
-            "gpt-5": 0.000010,
-            "gpt-5-mini": 0.000002,
-            "gpt-5-nano": 0.0000004,
-        }
+        # Compute costs using config pricing. Unknown models fall back gracefully.
+        prompt_per_token, completion_per_token = self.config.get_token_costs(model)
         # TODO: Check if we can remove the next 2 lines as we have introduced influx db for usage tracking.
         self._cost += (
-            response.usage.prompt_tokens * prompt_token_cost[model]
-            + response.usage.completion_tokens * output_token_cost[model]
+            response.usage.prompt_tokens * prompt_per_token
+            + response.usage.completion_tokens * completion_per_token
         )
         self._tokens = {
             "input_tokens": self._tokens["input_tokens"] + response.usage.prompt_tokens,
