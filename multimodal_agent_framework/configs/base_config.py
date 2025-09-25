@@ -34,16 +34,23 @@ class BaseLLMConfig:
         out_cost = self.completion_token_costs.get(model_key)
 
         if in_cost is None:
-            in_cost = self.default_prompt_cost if self.default_prompt_cost is not None else 0.0
+            in_cost = (
+                self.default_prompt_cost
+                if self.default_prompt_cost is not None
+                else 0.0
+            )
         if out_cost is None:
             out_cost = (
-                self.default_completion_cost if self.default_completion_cost is not None else 0.0
+                self.default_completion_cost
+                if self.default_completion_cost is not None
+                else 0.0
             )
 
-        if (model_key not in self.prompt_token_costs) or (model_key not in self.completion_token_costs):
+        if (model_key not in self.prompt_token_costs) or (
+            model_key not in self.completion_token_costs
+        ):
             logger.debug(
                 f"Pricing not found for provider={self.provider}, model={model_key}. "
                 f"Using defaults prompt={in_cost}, completion={out_cost}."
             )
         return in_cost, out_cost
-

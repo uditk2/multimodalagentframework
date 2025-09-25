@@ -12,4 +12,3 @@ class ClaudeConfig(BaseLLMConfig):
             default_prompt_cost=0.000003,
             default_completion_cost=0.000015,
         )
-

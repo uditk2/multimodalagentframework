@@ -4,7 +4,7 @@ from .base import Connector
 from ..configs.claude_config import ClaudeConfig
 from typing import Optional
 from ..logging_config import get_logger
-from ..token_tracker import token_tracker
+from ..token_tracker import BaseTokenUsageTracker
 
 logger = get_logger()
 
@@ -13,8 +13,13 @@ class ClaudeConnector(Connector):
     supported_roles = ["system", "assistant", "user"]
     convert_image_fmt = {"jpeg": "png", "jpg": "png"}
 
-    def __init__(self, client, config: Optional[ClaudeConfig] = None):
-        super().__init__(client)
+    def __init__(
+        self,
+        client,
+        config: Optional[ClaudeConfig] = None,
+        token_tracker: BaseTokenUsageTracker = None,
+    ):
+        super().__init__(client, token_tracker)
         self.config = config or ClaudeConfig()
 
     def create_message_internal(self, text=None, base64_image=None):
@@ -115,7 +120,7 @@ class ClaudeConnector(Connector):
             "output_tokens": response.usage.output_tokens,
             "model": model,
         }
-        token_tracker.track_token_usage(
+        self.token_tracker.track_token_usage(
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
             model_name=model,

@@ -2,21 +2,33 @@ import json
 import copy
 from typing import Union
 from ..logging_config import get_logger
+from ..token_tracker import (
+    BaseTokenUsageTracker,
+    DefaultTokenUsageTracker,
+    token_tracker,
+)
 
 logger = get_logger()
-from ..token_tracker import token_tracker
 
 
 class Connector:
-    def __init__(self, client):
+    _default_token_tracker = DefaultTokenUsageTracker()
+
+    def __init__(self, client, token_tracker: BaseTokenUsageTracker = None):
         if client is None:
             raise ValueError("Client is required")
         self.client = client
+        self.token_tracker = token_tracker or self._default_token_tracker
         self._cost = 0
         self._tokens = {"input_tokens": 0, "output_tokens": 0}
         self._response_tokens = {"input_tokens": 0, "output_tokens": 0, "model": None}
         self._func_obj_map = {}
         self._context = {}
+
+    @classmethod
+    def set_default_token_tracker(cls, tracker: BaseTokenUsageTracker):
+        """Set the default token tracker for all new Connector instances."""
+        cls._default_token_tracker = tracker
 
     def get_cost(self):
         return self._cost

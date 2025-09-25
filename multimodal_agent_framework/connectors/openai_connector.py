@@ -4,7 +4,7 @@ from .base import Connector
 from ..configs.openai_config import OpenAIConfig
 from typing import Optional
 from ..logging_config import get_logger
-from ..token_tracker import token_tracker
+from ..token_tracker import BaseTokenUsageTracker
 
 logger = get_logger()
 
@@ -13,8 +13,13 @@ class OpenAIConnector(Connector):
     supported_roles = ["system", "assistant", "user", "function", "tool", "developer"]
     reasoning = ["low", "medium", "high"]
 
-    def __init__(self, client, config: Optional[OpenAIConfig] = None):
-        super().__init__(client)
+    def __init__(
+        self,
+        client,
+        config: Optional[OpenAIConfig] = None,
+        token_tracker: BaseTokenUsageTracker = None,
+    ):
+        super().__init__(client, token_tracker)
         self.config = config or OpenAIConfig()
 
     def create_message_internal(self, text=None, base64_image=None):
@@ -190,7 +195,7 @@ class OpenAIConnector(Connector):
             "output_tokens": response.usage.completion_tokens,
             "model": model,
         }
-        token_tracker.track_token_usage(
+        self.token_tracker.track_token_usage(
             input_tokens=response.usage.prompt_tokens,
             output_tokens=response.usage.completion_tokens,
             model_name=model,

@@ -15,4 +15,3 @@ class AzureOpenSourceConfig(BaseLLMConfig):
             default_prompt_cost=0.0,
             default_completion_cost=0.0,
         )
-
