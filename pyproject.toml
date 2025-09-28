@@ -56,8 +56,8 @@ dev = [
 "Bug Reports" = "https://github.com/uditk2/multimodalagentframework/issues"
 "Source" = "https://github.com/uditk2/multimodalagentframework"
 
-[tool.setuptools]
-packages = ["multimodal_agent_framework"]
+[tool.setuptools.packages.find]
+exclude = ["tests*", "examples*", "venv*"]
 
 [tool.setuptools.package-data]
 multimodal_agent_framework = ["*.md"]

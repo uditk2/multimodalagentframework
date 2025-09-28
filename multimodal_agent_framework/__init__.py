@@ -12,7 +12,7 @@ from .connectors import (
     ClaudeConnector,
     AzureOpenSourceConnector,
 )
-from .multimodal_agent import MultiModalAgent
+from .multimodal_agent import MultiModalAgent, Reviewer, NoTokensAvailableError
 from .helper_functions import (
     get_openai_client,
     get_claude_client,
@@ -29,6 +29,8 @@ __all__ = [
     "ClaudeConnector",
     "AzureOpenSourceConnector",
     "MultiModalAgent",
+    "Reviewer",
+    "NoTokensAvailableError",
     "get_openai_client",
     "get_claude_client",
     "get_azure_opensource_client",

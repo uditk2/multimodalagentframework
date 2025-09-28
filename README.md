@@ -178,11 +178,36 @@ agent = MultiModalAgent(
 
 ## Development
 
+### Setup
 ```bash
 git clone <repository-url>
-cd AgentFramework
+cd multimodalagentframework
 pip install -r requirements.txt
-pip install -e .
+pip install -e .[dev]  # Install with development dependencies
+```
+
+### Running Tests
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=multimodal_agent_framework
+
+# Run specific test file
+pytest tests/test_function_schema_generator.py
+```
+
+### Code Quality
+```bash
+# Format code
+black .
+
+# Check formatting (run before committing)
+black --check .
+
+# Type checking
+mypy multimodal_agent_framework/
 ```
 
 ## License

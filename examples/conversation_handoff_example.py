@@ -12,7 +12,7 @@ from multimodal_agent_framework import (
     OpenAIConnector,
     ClaudeConnector,
     get_openai_client,
-    get_claude_client
+    get_claude_client,
 )
 
 
@@ -27,7 +27,7 @@ def demonstrate_conversation_handoff():
         name="OpenAI_Analyst",
         system_prompt="""You are a technical analyst. Analyze problems methodically and provide
         detailed technical explanations. Be thorough in your reasoning.""",
-        connector=OpenAIConnector(get_openai_client())
+        connector=OpenAIConnector(get_openai_client()),
     )
 
     # Initialize Claude agent for review/opinion
@@ -36,7 +36,7 @@ def demonstrate_conversation_handoff():
         system_prompt="""You are a critical reviewer and second opinion provider. Review the
         previous conversation and provide your perspective, critique, or alternative viewpoint.
         Be constructive but don't hesitate to disagree if you have a different opinion.""",
-        connector=ClaudeConnector(get_claude_client())
+        connector=ClaudeConnector(get_claude_client()),
     )
 
     # Step 1: Ask OpenAI agent a technical question
@@ -48,8 +48,7 @@ def demonstrate_conversation_handoff():
     """
 
     openai_response, openai_chat_history = openai_agent.execute_user_ask(
-        user_input=question,
-        model="gpt-5-nano"
+        user_input=question, model="gpt-5-nano"
     )
 
     print(f"OpenAI Response:\n{openai_response}\n")
@@ -60,9 +59,7 @@ def demonstrate_conversation_handoff():
     followup = "What about the deployment and monitoring complexity differences?"
 
     openai_response2, updated_chat_history = openai_agent.execute_user_ask(
-        user_input=followup,
-        chat_history=openai_chat_history,
-        model="gpt-5-nano"
+        user_input=followup, chat_history=openai_chat_history, model="gpt-5-nano"
     )
 
     print(f"OpenAI Follow-up Response:\n{openai_response2}\n")
@@ -86,7 +83,7 @@ def demonstrate_conversation_handoff():
     claude_response, final_chat_history = claude_agent.execute_user_ask(
         user_input=claude_review_prompt,
         chat_history=updated_chat_history,  # Pass the OpenAI conversation history
-        model="claude-3-5-sonnet-20241022"
+        model="claude-3-5-sonnet-20241022",
     )
 
     print(f"Claude's Review:\n{claude_response}\n")
@@ -95,14 +92,14 @@ def demonstrate_conversation_handoff():
     # Step 4: Show the complete conversation flow
     print("\n=== Complete Conversation Flow ===")
     for i, message in enumerate(final_chat_history):
-        role = message.get('role', 'unknown')
-        content = message.get('content', '')
+        role = message.get("role", "unknown")
+        content = message.get("content", "")
         if isinstance(content, list):
             # Handle multimodal content
             text_content = ""
             for item in content:
-                if isinstance(item, dict) and item.get('type') == 'text':
-                    text_content += item.get('text', '')
+                if isinstance(item, dict) and item.get("type") == "text":
+                    text_content += item.get("text", "")
             content = text_content
 
         print(f"\n[{i+1}] {role.upper()}:")
@@ -122,14 +119,14 @@ def demonstrate_multi_agent_discussion():
         name="OpenAI_Optimist",
         system_prompt="""You are an optimistic technology enthusiast. You tend to focus on
         the benefits and potential of new technologies. Be encouraging and highlight opportunities.""",
-        connector=OpenAIConnector(get_openai_client())
+        connector=OpenAIConnector(get_openai_client()),
     )
 
     claude_agent = MultiModalAgent(
         name="Claude_Skeptic",
         system_prompt="""You are a thoughtful skeptic. You consider risks, challenges, and
         potential downsides. You're not negative, but you ensure all perspectives are considered.""",
-        connector=ClaudeConnector(get_claude_client())
+        connector=ClaudeConnector(get_claude_client()),
     )
 
     # Start discussion
@@ -139,26 +136,25 @@ def demonstrate_multi_agent_discussion():
 
     # Round 1: OpenAI's perspective
     openai_response, chat_history = openai_agent.execute_user_ask(
-        user_input=topic,
-        model="gpt-4o"
+        user_input=topic, model="gpt-4o"
     )
     print(f"OpenAI (Optimist) says:\n{openai_response}\n")
 
     # Round 1: Claude's counter-perspective
-    claude_prompt = "Please respond to the previous argument. What are your thoughts and concerns?"
+    claude_prompt = (
+        "Please respond to the previous argument. What are your thoughts and concerns?"
+    )
     claude_response, chat_history = claude_agent.execute_user_ask(
         user_input=claude_prompt,
         chat_history=chat_history,
-        model="claude-3-5-sonnet-20241022"
+        model="claude-3-5-sonnet-20241022",
     )
     print(f"Claude (Skeptic) responds:\n{claude_response}\n")
 
     # Round 2: OpenAI addresses Claude's concerns
     openai_counter = "Please address the concerns raised and provide counter-arguments."
     openai_response2, chat_history = openai_agent.execute_user_ask(
-        user_input=openai_counter,
-        chat_history=chat_history,
-        model="gpt-5-nano"
+        user_input=openai_counter, chat_history=chat_history, model="gpt-5-nano"
     )
     print(f"OpenAI counters:\n{openai_response2}\n")
 
@@ -169,7 +165,7 @@ def demonstrate_multi_agent_discussion():
     final_response, final_history = claude_agent.execute_user_ask(
         user_input=synthesis_prompt,
         chat_history=chat_history,
-        model="claude-3-5-sonnet-latest"
+        model="claude-3-5-sonnet-latest",
     )
     print(f"Final Synthesis:\n{final_response}\n")
 
@@ -187,7 +183,9 @@ if __name__ == "__main__":
         print(f"\n=== Summary ===")
         print(f"First example generated {len(chat_history1)} total messages")
         print(f"Second example generated {len(chat_history2)} total messages")
-        print("Both examples demonstrate successful conversation handoff between different AI providers!")
+        print(
+            "Both examples demonstrate successful conversation handoff between different AI providers!"
+        )
 
     except Exception as e:
         print(f"Error running examples: {e}")
