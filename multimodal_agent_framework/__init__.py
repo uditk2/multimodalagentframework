@@ -22,7 +22,6 @@ from .helper_functions import (
 )
 from .function_schema_generator import generate_function_schema
 
-__version__ = "0.1.0"
 __all__ = [
     "Connector",
     "OpenAIConnector",
