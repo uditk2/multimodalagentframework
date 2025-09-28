@@ -13,11 +13,17 @@ from multimodal_agent_framework import (
     OpenAIConnector,
     ClaudeConnector,
     get_openai_client,
-    get_claude_client
+    get_claude_client,
 )
-from multimodal_agent_framework.conversation_manager.agent_conversation_manager import AgentConversationManager
-from multimodal_agent_framework.conversation_manager.agent_conversation import AgentConversation
-from multimodal_agent_framework.conversation_manager.storage.file_storage import FileStorage
+from multimodal_agent_framework.conversation_manager.agent_conversation_manager import (
+    AgentConversationManager,
+)
+from multimodal_agent_framework.conversation_manager.agent_conversation import (
+    AgentConversation,
+)
+from multimodal_agent_framework.conversation_manager.storage.file_storage import (
+    FileStorage,
+)
 from multimodal_agent_framework.conversation_manager.storage.s3_storage import S3Storage
 import uuid
 from datetime import datetime
@@ -30,7 +36,7 @@ def demonstrate_persistent_conversation_handoff():
     print("=== Persistent Conversation Handoff Example ===\n")
 
     # Setup conversation manager with file storage
-    storage = FileStorage(base_path='./conversation_handoff_storage')
+    storage = FileStorage(base_path="./conversation_handoff_storage")
     conversation_manager = AgentConversationManager(storage=storage)
 
     # Generate unique IDs for this conversation session
@@ -45,7 +51,7 @@ def demonstrate_persistent_conversation_handoff():
         name="OpenAI_TechAdvisor",
         system_prompt="""You are a senior technical advisor. Provide detailed technical analysis
         and recommendations. Be thorough in your explanations and consider multiple factors.""",
-        connector=OpenAIConnector(get_openai_client())
+        connector=OpenAIConnector(get_openai_client()),
     )
 
     # Step 1: Ask OpenAI agent a question and save the conversation
@@ -57,8 +63,7 @@ def demonstrate_persistent_conversation_handoff():
     """
 
     openai_response, chat_history = openai_agent.execute_user_ask(
-        user_input=question,
-        model="gpt-5-nano"
+        user_input=question, model="gpt-5-nano"
     )
 
     print(f"OpenAI Response:\n{openai_response[:300]}...\n")
@@ -71,21 +76,23 @@ def demonstrate_persistent_conversation_handoff():
             "session_start": datetime.now().isoformat(),
             "current_agent": "OpenAI_TechAdvisor",
             "conversation_stage": "initial_consultation",
-            "topic": "cloud_architecture"
-        }
+            "topic": "cloud_architecture",
+        },
     )
 
-    conversation_manager.save_conversation(user_id, "OpenAI_TechAdvisor", conversation, chat_id)
-    print(f"✅ Saved conversation after OpenAI response ({len(chat_history)} messages)\n")
+    conversation_manager.save_conversation(
+        user_id, "OpenAI_TechAdvisor", conversation, chat_id
+    )
+    print(
+        f"✅ Saved conversation after OpenAI response ({len(chat_history)} messages)\n"
+    )
 
     # Step 2: Add a follow-up question and update the stored conversation
     print("Step 2: Follow-up question to OpenAI...")
     followup = "What about cost optimization strategies for this architecture? Any specific tips for a startup budget?"
 
     openai_response2, updated_chat_history = openai_agent.execute_user_ask(
-        user_input=followup,
-        chat_history=chat_history,
-        model="gpt-4o"
+        user_input=followup, chat_history=chat_history, model="gpt-4o"
     )
 
     print(f"OpenAI Follow-up Response:\n{openai_response2[:300]}...\n")
@@ -95,17 +102,25 @@ def demonstrate_persistent_conversation_handoff():
     conversation.metadata["last_openai_response"] = datetime.now().isoformat()
     conversation.metadata["conversation_stage"] = "detailed_discussion"
 
-    conversation_manager.save_conversation(user_id, "OpenAI_TechAdvisor", conversation, chat_id)
-    print(f"✅ Updated conversation after follow-up ({len(updated_chat_history)} messages)\n")
+    conversation_manager.save_conversation(
+        user_id, "OpenAI_TechAdvisor", conversation, chat_id
+    )
+    print(
+        f"✅ Updated conversation after follow-up ({len(updated_chat_history)} messages)\n"
+    )
 
     # Step 3: Load the conversation and hand it off to Claude
     print("Step 3: Loading conversation and handing off to Claude agent...")
 
     # Load the saved conversation
-    loaded_conversation = conversation_manager.load_conversation(user_id, "OpenAI_TechAdvisor", chat_id)
+    loaded_conversation = conversation_manager.load_conversation(
+        user_id, "OpenAI_TechAdvisor", chat_id
+    )
 
     if loaded_conversation:
-        print(f"✅ Loaded conversation with {len(loaded_conversation.chat_history)} messages")
+        print(
+            f"✅ Loaded conversation with {len(loaded_conversation.chat_history)} messages"
+        )
         print(f"   Original agent: {loaded_conversation.agent_name}")
         print(f"   Topic: {loaded_conversation.metadata.get('topic')}\n")
     else:
@@ -118,7 +133,7 @@ def demonstrate_persistent_conversation_handoff():
         system_prompt="""You are a critical architecture reviewer and security expert.
         Review technical recommendations with focus on security, scalability, and best practices.
         Provide constructive feedback and alternative suggestions when appropriate.""",
-        connector=ClaudeConnector(get_claude_client())
+        connector=ClaudeConnector(get_claude_client()),
     )
 
     # Claude reviews the OpenAI conversation
@@ -138,7 +153,7 @@ def demonstrate_persistent_conversation_handoff():
     claude_response, final_chat_history = claude_agent.execute_user_ask(
         user_input=claude_review_prompt,
         chat_history=loaded_conversation.chat_history,  # Continue from loaded history
-        model="claude-3-5-sonnet-20241022"
+        model="claude-3-5-sonnet-20241022",
     )
 
     print(f"Claude's Review:\n{claude_response[:400]}...\n")
@@ -146,17 +161,25 @@ def demonstrate_persistent_conversation_handoff():
     # Step 4: Save the complete conversation with Claude's review
     # Update the conversation to reflect Claude's involvement
     loaded_conversation.chat_history = final_chat_history
-    loaded_conversation.agent_name = "Multi_Agent_Session"  # Indicate multiple agents involved
-    loaded_conversation.metadata.update({
-        "claude_review_time": datetime.now().isoformat(),
-        "conversation_stage": "expert_review_complete",
-        "agents_involved": ["OpenAI_TechAdvisor", "Claude_Reviewer"],
-        "final_message_count": len(final_chat_history)
-    })
+    loaded_conversation.agent_name = (
+        "Multi_Agent_Session"  # Indicate multiple agents involved
+    )
+    loaded_conversation.metadata.update(
+        {
+            "claude_review_time": datetime.now().isoformat(),
+            "conversation_stage": "expert_review_complete",
+            "agents_involved": ["OpenAI_TechAdvisor", "Claude_Reviewer"],
+            "final_message_count": len(final_chat_history),
+        }
+    )
 
     # Save the final conversation
-    conversation_manager.save_conversation(user_id, "Multi_Agent_Session", loaded_conversation, chat_id)
-    print(f"✅ Saved complete conversation with Claude's review ({len(final_chat_history)} messages)\n")
+    conversation_manager.save_conversation(
+        user_id, "Multi_Agent_Session", loaded_conversation, chat_id
+    )
+    print(
+        f"✅ Saved complete conversation with Claude's review ({len(final_chat_history)} messages)\n"
+    )
 
     # Step 5: Demonstrate listing and retrieving conversations
     print("Step 5: Listing all conversations for this user...")
@@ -186,7 +209,7 @@ def demonstrate_persistent_conversation_handoff():
     # Show message breakdown by role
     role_counts = {}
     for msg in final_chat_history:
-        role = msg.get('role', 'unknown')
+        role = msg.get("role", "unknown")
         role_counts[role] = role_counts.get(role, 0) + 1
 
     print(f"Message breakdown: {role_counts}")
@@ -202,7 +225,7 @@ def demonstrate_conversation_continuation():
     print("\n\n=== Conversation Continuation with Storage Migration Example ===\n")
 
     # Step 1: Setup file storage manager to load existing conversation
-    file_storage = FileStorage(base_path='./conversation_handoff_storage')
+    file_storage = FileStorage(base_path="./conversation_handoff_storage")
     file_manager = AgentConversationManager(storage=file_storage)
 
     user_id = "user_demo"
@@ -218,7 +241,7 @@ def demonstrate_conversation_continuation():
         return
 
     # Load the most recent conversation from file storage
-    latest_chat_id = conversations[0]['chat_id']
+    latest_chat_id = conversations[0]["chat_id"]
     print(f"Loading conversation from file: {latest_chat_id}")
 
     loaded_conversation = file_manager.load_conversation(
@@ -229,7 +252,9 @@ def demonstrate_conversation_continuation():
         print("Failed to load conversation from file storage")
         return
 
-    print(f"✅ Loaded conversation from file with {len(loaded_conversation.chat_history)} messages")
+    print(
+        f"✅ Loaded conversation from file with {len(loaded_conversation.chat_history)} messages"
+    )
     print(f"   Agents involved: {loaded_conversation.metadata.get('agents_involved')}")
     print(f"   Last stage: {loaded_conversation.metadata.get('conversation_stage')}\n")
 
@@ -249,7 +274,7 @@ def demonstrate_conversation_continuation():
         name="Claude_Reviewer",
         system_prompt="""You are continuing a technical architecture review.
         Refer to the previous discussion and provide additional insights.""",
-        connector=ClaudeConnector(get_claude_client())
+        connector=ClaudeConnector(get_claude_client()),
     )
 
     continuation_question = """
@@ -262,20 +287,27 @@ def demonstrate_conversation_continuation():
     response, updated_history = claude_agent.execute_user_ask(
         user_input=continuation_question,
         chat_history=loaded_conversation.chat_history,
-        model="claude-3-5-sonnet-20241022"
+        model="claude-3-5-sonnet-20241022",
     )
 
     print(f"Continuation Response:\n{response[:400]}...\n")
 
     # Step 4: Update metadata and save to S3 (or file if S3 unavailable)
     loaded_conversation.chat_history = updated_history
-    loaded_conversation.metadata.update({
-        "continued_at": datetime.now().isoformat(),
-        "conversation_stage": "implementation_roadmap",
-        "storage_migration": "file_to_s3" if s3_manager != file_manager else "file_only",
-        "total_continuations": loaded_conversation.metadata.get("total_continuations", 0) + 1,
-        "continuation_topics": ["implementation_roadmap", "cost_estimation"]
-    })
+    loaded_conversation.metadata.update(
+        {
+            "continued_at": datetime.now().isoformat(),
+            "conversation_stage": "implementation_roadmap",
+            "storage_migration": (
+                "file_to_s3" if s3_manager != file_manager else "file_only"
+            ),
+            "total_continuations": loaded_conversation.metadata.get(
+                "total_continuations", 0
+            )
+            + 1,
+            "continuation_topics": ["implementation_roadmap", "cost_estimation"],
+        }
+    )
 
     # Generate new chat_id for the continued conversation in S3
     continued_chat_id = f"continued_{latest_chat_id}_{uuid.uuid4().hex[:6]}"
@@ -283,26 +315,47 @@ def demonstrate_conversation_continuation():
     print("Step 4: Saving continued conversation...")
     if s3_manager != file_manager:
         print("   Saving to S3 storage...")
-        s3_manager.save_conversation(user_id, "Multi_Agent_Session", loaded_conversation, continued_chat_id)
-        print(f"✅ Saved continued conversation to S3 ({len(updated_history)} messages)")
+        s3_manager.save_conversation(
+            user_id, "Multi_Agent_Session", loaded_conversation, continued_chat_id
+        )
+        print(
+            f"✅ Saved continued conversation to S3 ({len(updated_history)} messages)"
+        )
 
         # Also save to file storage as backup
         print("   Creating backup in file storage...")
-        file_manager.save_conversation(user_id, "Multi_Agent_Session_Backup", loaded_conversation, continued_chat_id)
+        file_manager.save_conversation(
+            user_id,
+            "Multi_Agent_Session_Backup",
+            loaded_conversation,
+            continued_chat_id,
+        )
         print("✅ Backup saved to file storage")
     else:
         print("   Saving to file storage...")
-        file_manager.save_conversation(user_id, "Multi_Agent_Session", loaded_conversation, continued_chat_id)
-        print(f"✅ Saved continued conversation to file ({len(updated_history)} messages)")
+        file_manager.save_conversation(
+            user_id, "Multi_Agent_Session", loaded_conversation, continued_chat_id
+        )
+        print(
+            f"✅ Saved continued conversation to file ({len(updated_history)} messages)"
+        )
 
     # Step 5: Verify conversation exists in target storage
     print("\nStep 5: Verifying saved conversation...")
-    verification_conversation = s3_manager.load_conversation(user_id, "Multi_Agent_Session", continued_chat_id)
+    verification_conversation = s3_manager.load_conversation(
+        user_id, "Multi_Agent_Session", continued_chat_id
+    )
 
     if verification_conversation:
-        print(f"✅ Verification successful - conversation has {len(verification_conversation.chat_history)} messages")
-        print(f"   Storage migration status: {verification_conversation.metadata.get('storage_migration')}")
-        print(f"   Total continuations: {verification_conversation.metadata.get('total_continuations')}")
+        print(
+            f"✅ Verification successful - conversation has {len(verification_conversation.chat_history)} messages"
+        )
+        print(
+            f"   Storage migration status: {verification_conversation.metadata.get('storage_migration')}"
+        )
+        print(
+            f"   Total continuations: {verification_conversation.metadata.get('total_continuations')}"
+        )
     else:
         print("❌ Verification failed - could not load continued conversation")
 
@@ -316,7 +369,9 @@ def demonstrate_conversation_continuation():
 
     if s3_manager != file_manager:
         try:
-            s3_conversations = s3_manager.list_conversations(user_id, "Multi_Agent_Session")
+            s3_conversations = s3_manager.list_conversations(
+                user_id, "Multi_Agent_Session"
+            )
             print(f"S3 storage conversations: {len(s3_conversations)}")
             for conv in s3_conversations[-2:]:  # Show last 2
                 print(f"  - {conv['chat_id']} (S3)")

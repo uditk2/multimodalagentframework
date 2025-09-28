@@ -1,5 +1,11 @@
-from multimodal_agent_framework import MultiModalAgent, OpenAIConnector, get_openai_client
-class ResponseSummaryAgent():
+from multimodal_agent_framework import (
+    MultiModalAgent,
+    OpenAIConnector,
+    get_openai_client,
+)
+
+
+class ResponseSummaryAgent:
     SYSTEM_PROMPT = """
     Please generate a summary of the provided information. 
     Try to be succinct and capture the essence of the information.
@@ -7,12 +13,19 @@ class ResponseSummaryAgent():
     Always think step by step and provide a summary.
 
     """
+
     def __init__(self):
-        self.agent = MultiModalAgent(name="ResponseSummary", system_prompt=self.SYSTEM_PROMPT, 
-                    reviewer=None, connector=OpenAIConnector(get_openai_client()))
+        self.agent = MultiModalAgent(
+            name="ResponseSummary",
+            system_prompt=self.SYSTEM_PROMPT,
+            reviewer=None,
+            connector=OpenAIConnector(get_openai_client()),
+        )
 
     def generate_summary(self, response=None, chat_history=None):
-        response, _ = self.agent.execute_user_ask(user_input=response, chat_history=chat_history, model="gpt-4o-mini")
+        response, _ = self.agent.execute_user_ask(
+            user_input=response, chat_history=chat_history, model="gpt-4o-mini"
+        )
         return response
 
 

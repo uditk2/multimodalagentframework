@@ -16,13 +16,45 @@ class NoTokensAvailableError(Exception):
 
 
 class Reviewer:
+    """
+    A reviewer that can process agent responses with custom review logic.
+
+    The review_function, if provided, should follow this contract:
+    - Input: (review_prompt: str, response: any)
+    - Output: tuple[str, any] where:
+      - First element: review message text to send back to the agent
+      - Second element: optional image data (base64 dict or None)
+
+    Example:
+        def custom_reviewer(prompt, response):
+            analysis = f"Reviewing: {response}"
+            return analysis, None  # (message, image)
+    """
+
     def __init__(self, review_prompt: str = None, review_function=None):
+        """
+        Initialize the reviewer.
+
+        Args:
+            review_prompt: Default prompt to use for reviews
+            review_function: Custom function that takes (prompt, response)
+                           and returns (review_message, image_data)
+        """
         self.review_prompt = (
             review_prompt or "Please review the conversation and provide feedback."
         )
         self.review_function = review_function
 
     def get_message(self, response):
+        """
+        Get review message for the given response.
+
+        Args:
+            response: The agent's response to review
+
+        Returns:
+            tuple[str, any]: (review_message, image_data)
+        """
         if self.review_function is None:
             return self.review_prompt, None
         # TODO This does not support reviewing the tools. To be tested.
@@ -159,11 +191,17 @@ class MultiModalAgent:
 
     def check_tokens(self, chat_history=None):
         if self.check_token_callback is not None:
-            self.check_token_callback(chat_history)
+            try:
+                self.check_token_callback(chat_history)
+            except Exception as e:
+                logger.warning(f"Token check callback failed: {e}")
 
     def update_tokens(self, response_tokens=None):
         if self.update_token_callback is not None:
-            self.update_token_callback(response_tokens)
+            try:
+                self.update_token_callback(response_tokens)
+            except Exception as e:
+                logger.warning(f"Token update callback failed: {e}")
 
     def should_retry_exception(e):
         return "Rate limit" in str(e) or "429" in str(e) or "529" in str(e)
