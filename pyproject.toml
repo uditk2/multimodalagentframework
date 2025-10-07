@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "multimodal-agent-framework"
-version = "0.1.9"
+version = "0.1.10"
 description = "A multi-modal agent framework with unified interfaces for different AI model providers"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.13"
 license = {text = "MIT"}
 authors = [
     {name = "Your Name", email = "your.email@example.com"}
@@ -23,7 +23,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
